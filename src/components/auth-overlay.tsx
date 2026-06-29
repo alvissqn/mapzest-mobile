@@ -33,6 +33,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons, Feather, AntDesign } from '@expo/vector-icons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -133,6 +134,7 @@ interface InputFieldProps {
   keyboardType?: 'default' | 'email-address' | 'phone-pad';
   autoCapitalize?: 'none' | 'sentences' | 'words';
   rightElement?: React.ReactNode;
+  iconName?: keyof typeof Feather.glyphMap;
 }
 
 function InputField({
@@ -144,6 +146,7 @@ function InputField({
   keyboardType = 'default',
   autoCapitalize = 'none',
   rightElement,
+  iconName,
 }: InputFieldProps) {
   const [focused, setFocused] = useState(false);
   return (
@@ -153,6 +156,14 @@ function InputField({
         inputStyles.inputRow,
         focused && inputStyles.inputRowFocused,
       ]}>
+        {iconName && (
+          <Feather
+            name={iconName}
+            size={18}
+            color={focused ? PRIMARY : '#94A3B8'}
+            style={inputStyles.leftIcon}
+          />
+        )}
         <TextInput
           style={inputStyles.input}
           placeholder={placeholder}
@@ -191,6 +202,9 @@ const inputStyles = StyleSheet.create({
   inputRowFocused: {
     borderColor: PRIMARY,
     backgroundColor: '#EFF6FF',
+  },
+  leftIcon: {
+    marginRight: 10,
   },
   input: {
     flex: 1,
@@ -249,17 +263,11 @@ const eyeStyles = StyleSheet.create({
 function SocialButton({ provider, onPress }: { provider: 'google' | 'apple'; onPress: () => void }) {
   return (
     <TouchableOpacity style={socialStyles.btn} onPress={onPress} activeOpacity={0.75}>
-      {/* Provider icon placeholder */}
-      <View style={[socialStyles.iconBox, { backgroundColor: provider === 'google' ? '#EA4335' : '#000' }]}>
-        <Text style={socialStyles.iconText}>{provider === 'google' ? 'G' : ''}</Text>
-        {provider === 'apple' && (
-          // Apple logo (simplified)
-          <View style={socialStyles.appleIcon}>
-            <View style={socialStyles.appleTop} />
-            <View style={socialStyles.appleBody} />
-          </View>
-        )}
-      </View>
+      {provider === 'google' ? (
+        <AntDesign name="google" size={20} color="#EA4335" />
+      ) : (
+        <AntDesign name="apple" size={20} color="#000000" />
+      )}
       <Text style={socialStyles.label}>
         {provider === 'google' ? 'Google' : 'Apple'}
       </Text>
@@ -273,25 +281,14 @@ const socialStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 10,
     height: 48,
     borderWidth: 1.5,
     borderColor: BORDER_COLOR,
     borderRadius: 12,
     backgroundColor: '#fff',
   },
-  iconBox: {
-    width: 22,
-    height: 22,
-    borderRadius: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconText: { color: '#fff', fontSize: 13, fontWeight: '800' },
   label: { fontSize: 14, fontWeight: '600', color: TEXT_MAIN },
-  appleIcon: { alignItems: 'center' },
-  appleTop: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#fff', marginBottom: 1 },
-  appleBody: { width: 10, height: 11, borderRadius: 2, backgroundColor: '#fff' },
 });
 
 // ─── Checkbox ─────────────────────────────────────────────────────────────────
@@ -375,6 +372,7 @@ function LoginScreen({ onLoginSuccess, onGoRegister }: LoginScreenProps) {
             value={phone}
             onChangeText={setPhone}
             keyboardType="email-address"
+            iconName="phone"
           />
 
           <InputField
@@ -383,6 +381,7 @@ function LoginScreen({ onLoginSuccess, onGoRegister }: LoginScreenProps) {
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showPass}
+            iconName="lock"
             rightElement={
               <EyeToggle visible={showPass} onToggle={() => setShowPass(!showPass)} />
             }
@@ -489,6 +488,7 @@ function RegisterScreen({ onRegisterSuccess, onGoLogin }: RegisterScreenProps) {
             value={fullName}
             onChangeText={setFullName}
             autoCapitalize="words"
+            iconName="user"
           />
 
           <InputField
@@ -497,6 +497,7 @@ function RegisterScreen({ onRegisterSuccess, onGoLogin }: RegisterScreenProps) {
             value={phone}
             onChangeText={setPhone}
             keyboardType="phone-pad"
+            iconName="phone"
           />
 
           <InputField
@@ -505,6 +506,7 @@ function RegisterScreen({ onRegisterSuccess, onGoLogin }: RegisterScreenProps) {
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
+            iconName="mail"
           />
 
           <InputField
@@ -513,6 +515,7 @@ function RegisterScreen({ onRegisterSuccess, onGoLogin }: RegisterScreenProps) {
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showPass}
+            iconName="lock"
             rightElement={
               <EyeToggle visible={showPass} onToggle={() => setShowPass(!showPass)} />
             }
@@ -524,6 +527,7 @@ function RegisterScreen({ onRegisterSuccess, onGoLogin }: RegisterScreenProps) {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry={!showConfirmPass}
+            iconName="lock"
             rightElement={
               <EyeToggle visible={showConfirmPass} onToggle={() => setShowConfirmPass(!showConfirmPass)} />
             }

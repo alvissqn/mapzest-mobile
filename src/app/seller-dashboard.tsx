@@ -15,6 +15,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { BottomTabInset } from '@/constants/theme';
+import { Ionicons, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { InboxOverlay } from '@/components/inbox-overlay';
+import { SellerAnalyticsOverlay } from '@/components/seller-analytics-overlay';
+import { SellerVipOverlay } from '@/components/seller-vip-overlay';
+import { useState } from 'react';
 
 const BG = '#F9FAFB';
 const PRIMARY = '#2563EB';
@@ -28,6 +33,10 @@ const ORANGE = '#EA580C';
 export default function SellerDashboardScreen() {
   const router = useRouter();
 
+  const [showInbox, setShowInbox] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showVip, setShowVip] = useState(false);
+
   function handleActionPress(name: string) {
     Alert.alert('Mapzest Seller', `Tính năng "${name}" đang được kết nối với API hệ thống.`);
   }
@@ -39,7 +48,7 @@ export default function SellerDashboardScreen() {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Seller Dashboard</Text>
           <TouchableOpacity style={styles.bellBtn} onPress={() => handleActionPress('Thông báo')}>
-            <Text style={styles.bellEmoji}>🔔</Text>
+            <Ionicons name="notifications-outline" size={18} color={GRAY_800} />
             <View style={styles.bellBadge} />
           </TouchableOpacity>
         </View>
@@ -53,28 +62,36 @@ export default function SellerDashboardScreen() {
         {/* Lời chào */}
         <View style={styles.welcomeRow}>
           <Text style={styles.greeting}>Xin chào,</Text>
-          <Text style={styles.sellerName}>Nguyễn Văn Seller 👋</Text>
+          <Text style={styles.sellerName}>Nguyễn Văn Seller</Text>
         </View>
 
         {/* ==================== 1. THỐNG KÊ THÁNG (Bento Grid) ==================== */}
         <View style={styles.statsGrid}>
           <View style={styles.statCard}>
-            <Text style={styles.statEmoji}>📋</Text>
+            <View style={styles.statIconWrap}>
+              <Ionicons name="list-outline" size={18} color={PRIMARY} />
+            </View>
             <Text style={styles.statNumber}>8</Text>
             <Text style={styles.statLabel}>Tin đang đăng</Text>
           </View>
           <View style={[styles.statCard, { backgroundColor: '#EFF6FF' }]}>
-            <Text style={styles.statEmoji}>👥</Text>
+            <View style={[styles.statIconWrap, { backgroundColor: '#DBEAFE' }]}>
+              <Ionicons name="people-outline" size={18} color={PRIMARY} />
+            </View>
             <Text style={[styles.statNumber, { color: PRIMARY }]}>+14</Text>
             <Text style={styles.statLabel}>Khách mới (Leads)</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statEmoji}>👁️</Text>
+            <View style={styles.statIconWrap}>
+              <Ionicons name="eye-outline" size={18} color={PRIMARY} />
+            </View>
             <Text style={styles.statNumber}>2.4k</Text>
             <Text style={styles.statLabel}>Lượt xem tin</Text>
           </View>
           <View style={[styles.statCard, { backgroundColor: '#FFF7ED' }]}>
-            <Text style={styles.statEmoji}>⚠️</Text>
+            <View style={[styles.statIconWrap, { backgroundColor: '#FFEDD5' }]}>
+              <Ionicons name="warning-outline" size={18} color={ORANGE} />
+            </View>
             <Text style={[styles.statNumber, { color: ORANGE }]}>1</Text>
             <Text style={styles.statLabel}>Sắp hết hạn</Text>
           </View>
@@ -85,30 +102,44 @@ export default function SellerDashboardScreen() {
         <View style={styles.quickGrid}>
           <TouchableOpacity style={styles.quickItem} onPress={() => router.navigate('/seller-post')} activeOpacity={0.8}>
             <View style={[styles.quickIconWrap, { backgroundColor: '#EFF6FF' }]}>
-              <Text style={styles.quickIcon}>➕</Text>
+              <Ionicons name="add" size={20} color={PRIMARY} />
             </View>
             <Text style={styles.quickLabel}>Đăng tin mới</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.quickItem} onPress={() => router.navigate('/seller-listings')} activeOpacity={0.8}>
             <View style={[styles.quickIconWrap, { backgroundColor: '#F0FDF4' }]}>
-              <Text style={styles.quickIcon}>📋</Text>
+              <Ionicons name="list-outline" size={20} color="#16A34A" />
             </View>
             <Text style={styles.quickLabel}>Quản lý tin</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.quickItem} onPress={() => handleActionPress('Tin nhắn')} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.quickItem} onPress={() => setShowInbox(true)} activeOpacity={0.8}>
             <View style={[styles.quickIconWrap, { backgroundColor: '#FAF5FF' }]}>
-              <Text style={styles.quickIcon}>💬</Text>
+              <Ionicons name="chatbubble-ellipses-outline" size={20} color="#7C3AED" />
             </View>
             <Text style={styles.quickLabel}>Tin nhắn</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.quickItem} onPress={() => handleActionPress('Khách hàng CRM')} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.quickItem} onPress={() => router.navigate('/seller-leads')} activeOpacity={0.8}>
             <View style={[styles.quickIconWrap, { backgroundColor: '#FFF7ED' }]}>
-              <Text style={styles.quickIcon}>👥</Text>
+              <Ionicons name="people-outline" size={20} color="#EA580C" />
             </View>
-            <Text style={styles.quickLabel}>Khách hàng</Text>
+            <Text style={styles.quickLabel}>Leads CRM</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.quickItem} onPress={() => setShowAnalytics(true)} activeOpacity={0.8}>
+            <View style={[styles.quickIconWrap, { backgroundColor: '#F0FDF4' }]}>
+              <Ionicons name="bar-chart-outline" size={20} color="#16A34A" />
+            </View>
+            <Text style={styles.quickLabel}>Thống kê</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.quickItem} onPress={() => setShowVip(true)} activeOpacity={0.8}>
+            <View style={[styles.quickIconWrap, { backgroundColor: '#FFF7ED' }]}>
+              <Ionicons name="diamond-outline" size={20} color="#D97706" />
+            </View>
+            <Text style={styles.quickLabel}>Gói VIP</Text>
           </TouchableOpacity>
         </View>
 
@@ -123,32 +154,68 @@ export default function SellerDashboardScreen() {
         <View style={styles.listingList}>
           {/* Card tin đăng 1 */}
           <TouchableOpacity style={styles.listingCard} onPress={() => router.navigate('/seller-listings')} activeOpacity={0.9}>
-            <View style={styles.listingImg}><Text style={styles.listingEmoji}>🏢</Text></View>
+            <View style={styles.listingImg}>
+              <MaterialCommunityIcons name="office-building-outline" size={24} color={PRIMARY} />
+            </View>
             <View style={styles.listingInfo}>
               <Text style={styles.listingTitle} numberOfLines={1}>Vinhomes Grand Park – The Rainbow</Text>
               <Text style={styles.listingPrice}>3.2 tỷ · 62m²</Text>
               <View style={styles.listingStats}>
-                <Text style={styles.listingStatItem}>👁️ 1.2k lượt xem</Text>
-                <Text style={styles.listingStatItem}>👥 8 khách hỏi</Text>
+                <View style={styles.listingStatRow}>
+                  <Ionicons name="eye-outline" size={12} color={GRAY_500} style={{ marginRight: 3 }} />
+                  <Text style={styles.listingStatItem}>1.2k lượt xem</Text>
+                </View>
+                <View style={styles.listingStatRow}>
+                  <Ionicons name="chatbubble-ellipses-outline" size={12} color={GRAY_500} style={{ marginRight: 3 }} />
+                  <Text style={styles.listingStatItem}>8 khách hỏi</Text>
+                </View>
               </View>
             </View>
           </TouchableOpacity>
 
           {/* Card tin đăng 2 */}
           <TouchableOpacity style={styles.listingCard} onPress={() => router.navigate('/seller-listings')} activeOpacity={0.9}>
-            <View style={[styles.listingImg, { backgroundColor: '#FEF3C7' }]}><Text style={styles.listingEmoji}>🏠</Text></View>
+            <View style={[styles.listingImg, { backgroundColor: '#FEF3C7' }]}>
+              <Ionicons name="home-outline" size={24} color="#D97706" />
+            </View>
             <View style={styles.listingInfo}>
               <Text style={styles.listingTitle} numberOfLines={1}>Nhà phố Thảo Điền view sông</Text>
               <Text style={styles.listingPrice}>12.5 tỷ · 115m²</Text>
               <View style={styles.listingStats}>
-                <Text style={styles.listingStatItem}>👁️ 850 lượt xem</Text>
-                <Text style={styles.listingStatItem}>👥 4 khách hỏi</Text>
+                <View style={styles.listingStatRow}>
+                  <Ionicons name="eye-outline" size={12} color={GRAY_500} style={{ marginRight: 3 }} />
+                  <Text style={styles.listingStatItem}>850 lượt xem</Text>
+                </View>
+                <View style={styles.listingStatRow}>
+                  <Ionicons name="chatbubble-ellipses-outline" size={12} color={GRAY_500} style={{ marginRight: 3 }} />
+                  <Text style={styles.listingStatItem}>4 khách hỏi</Text>
+                </View>
               </View>
             </View>
           </TouchableOpacity>
         </View>
 
       </ScrollView>
+
+      {/* RENDER CÁC OVERLAYS TOÀN MÀN HÌNH */}
+      <InboxOverlay
+        visible={showInbox}
+        onClose={() => setShowInbox(false)}
+      />
+
+      <SellerAnalyticsOverlay
+        visible={showAnalytics}
+        onClose={() => setShowAnalytics(false)}
+        onOpenVip={() => {
+          setShowAnalytics(false);
+          setShowVip(true);
+        }}
+      />
+
+      <SellerVipOverlay
+        visible={showVip}
+        onClose={() => setShowVip(false)}
+      />
     </View>
   );
 }
@@ -185,9 +252,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
-  },
-  bellEmoji: {
-    fontSize: 16,
   },
   bellBadge: {
     position: 'absolute',
@@ -240,8 +304,14 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 2,
   },
-  statEmoji: {
-    fontSize: 18,
+  statIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#EFF6FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 2,
   },
   statNumber: {
     fontSize: 20,
@@ -285,9 +355,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  quickIcon: {
-    fontSize: 18,
-  },
   quickLabel: {
     fontSize: 11,
     fontWeight: '700',
@@ -328,9 +395,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  listingEmoji: {
-    fontSize: 28,
-  },
   listingInfo: {
     flex: 1,
     justifyContent: 'center',
@@ -349,6 +413,10 @@ const styles = StyleSheet.create({
   listingStats: {
     flexDirection: 'row',
     gap: 12,
+  },
+  listingStatRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   listingStatItem: {
     fontSize: 10,

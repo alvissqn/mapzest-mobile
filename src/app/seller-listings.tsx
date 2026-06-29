@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabInset } from '@/constants/theme';
+import { Ionicons, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const BG = '#F9FAFB';
 const PRIMARY = '#2563EB';
@@ -117,6 +118,19 @@ export default function SellerListingsScreen() {
     ]);
   }
 
+  function getPropertyTypeIcon(type: string, size = 24) {
+    switch (type) {
+      case 'Căn hộ':
+        return <MaterialCommunityIcons name="office-building-outline" size={size} color={PRIMARY} />;
+      case 'Nhà phố':
+        return <Ionicons name="home-outline" size={size} color="#EA580C" />;
+      case 'Biệt thự':
+        return <MaterialCommunityIcons name="home-city-outline" size={size} color="#16A34A" />;
+      default:
+        return <MaterialCommunityIcons name="sprout-outline" size={size} color="#64748B" />;
+    }
+  }
+
   return (
     <View style={styles.root}>
       {/* Header */}
@@ -166,7 +180,7 @@ export default function SellerListingsScreen() {
             {/* Hàng thông tin chính */}
             <View style={styles.cardMain}>
               <View style={[styles.img, { backgroundColor: item.bgColor }]}>
-                <Text style={styles.imgEmoji}>{item.bgEmoji}</Text>
+                {getPropertyTypeIcon(item.type, 24)}
               </View>
               <View style={styles.info}>
                 <View style={styles.codeRow}>
@@ -178,8 +192,14 @@ export default function SellerListingsScreen() {
                 
                 {/* Stats */}
                 <View style={styles.statsRow}>
-                  <Text style={styles.statText}>👁️ {item.views} lượt xem</Text>
-                  <Text style={styles.statText}>📞 {item.leads} khách hỏi</Text>
+                  <View style={styles.statRow}>
+                    <Ionicons name="eye-outline" size={12} color={GRAY_500} style={{ marginRight: 3 }} />
+                    <Text style={styles.statText}>{item.views} lượt xem</Text>
+                  </View>
+                  <View style={styles.statRow}>
+                    <Ionicons name="chatbubble-ellipses-outline" size={12} color={GRAY_500} style={{ marginRight: 3 }} />
+                    <Text style={styles.statText}>{item.leads} khách hỏi</Text>
+                  </View>
                 </View>
               </View>
             </View>
@@ -188,19 +208,23 @@ export default function SellerListingsScreen() {
             <View style={styles.actionRow}>
               {item.status === 'active' && (
                 <TouchableOpacity style={styles.actionBtn} onPress={() => handlePromoteListing(item.id, item.title)}>
-                  <Text style={[styles.actionBtnText, { color: PRIMARY }]}>⚡ Đẩy VIP</Text>
+                  <Feather name="zap" size={12} color={PRIMARY} style={{ marginRight: 3 }} />
+                  <Text style={[styles.actionBtnText, { color: PRIMARY }]}>Đẩy VIP</Text>
                 </TouchableOpacity>
               )}
               <TouchableOpacity style={styles.actionBtn} onPress={() => Alert.alert('Chỉnh sửa', 'Chuyển sang màn sửa tin.')}>
-                <Text style={styles.actionBtnText}>✏️ Sửa</Text>
+                <Feather name="edit-2" size={12} color={GRAY_800} style={{ marginRight: 3 }} />
+                <Text style={styles.actionBtnText}>Sửa</Text>
               </TouchableOpacity>
               {item.status !== 'closed' ? (
                 <TouchableOpacity style={styles.actionBtn} onPress={() => handleCloseListing(item.id)}>
-                  <Text style={[styles.actionBtnText, { color: '#EA580C' }]}>📴 Đóng</Text>
+                  <Feather name="power" size={12} color="#EA580C" style={{ marginRight: 3 }} />
+                  <Text style={[styles.actionBtnText, { color: '#EA580C' }]}>Đóng</Text>
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity style={styles.actionBtn} onPress={() => handleClearListing(item.id)}>
-                  <Text style={[styles.actionBtnText, { color: '#DC2626' }]}>🗑️ Xóa</Text>
+                  <Feather name="trash-2" size={12} color="#DC2626" style={{ marginRight: 3 }} />
+                  <Text style={[styles.actionBtnText, { color: '#DC2626' }]}>Xóa</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -210,7 +234,7 @@ export default function SellerListingsScreen() {
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
         ListEmptyComponent={() => (
           <View style={styles.emptyWrap}>
-            <Text style={styles.emptyEmoji}>📋</Text>
+            <Ionicons name="document-text-outline" size={50} color="#94A3B8" />
             <Text style={styles.emptyTitle}>Không có tin đăng nào</Text>
             <Text style={styles.emptyHint}>Không có tin đăng nào trùng khớp ở mục này.</Text>
           </View>
@@ -242,7 +266,6 @@ const styles = StyleSheet.create({
   card: { backgroundColor: WHITE, marginHorizontal: 16, borderRadius: 14, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.03, shadowRadius: 6, elevation: 1 },
   cardMain: { flexDirection: 'row', padding: 12, gap: 12 },
   img: { width: 70, height: 70, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  imgEmoji: { fontSize: 32 },
   info: { flex: 1, gap: 3 },
   codeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   code: { fontSize: 10, color: GRAY_500, fontWeight: '600' },
@@ -251,16 +274,16 @@ const styles = StyleSheet.create({
   price: { fontSize: 13, fontWeight: '700', color: PRIMARY },
   area: { color: GRAY_800 },
   statsRow: { flexDirection: 'row', gap: 12, marginTop: 2 },
+  statRow: { flexDirection: 'row', alignItems: 'center' },
   statText: { fontSize: 10, color: GRAY_500 },
   
   // Action Row
   actionRow: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: '#F3F4F6', backgroundColor: '#FAFAFA' },
-  actionBtn: { flex: 1, paddingVertical: 10, alignItems: 'center', justifyContent: 'center' },
+  actionBtn: { flex: 1, paddingVertical: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   actionBtnText: { fontSize: 11, fontWeight: '700', color: GRAY_800 },
   
   // Empty
   emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, gap: 8, paddingTop: 100 },
-  emptyEmoji: { fontSize: 44, opacity: 0.8 },
   emptyTitle: { fontSize: 15, fontWeight: '700', color: GRAY_800 },
   emptyHint: { fontSize: 12, color: GRAY_500, textAlign: 'center' }
 });

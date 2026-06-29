@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const PRIMARY = '#2563EB';
 const GRAY_100 = '#F3F4F6';
@@ -120,9 +121,11 @@ export function HomeFeaturedList({ onPressItem, onToggleFavorite, onSeeAll }: Ho
                 activeOpacity={0.7}
                 accessibilityLabel={item.isFavorite ? 'Bỏ yêu thích' : 'Yêu thích'}
               >
-                <Text style={[styles.favIcon, item.isFavorite && styles.favIconActive]}>
-                  {item.isFavorite ? '❤️' : '🤍'}
-                </Text>
+                <Ionicons
+                  name={item.isFavorite ? 'heart' : 'heart-outline'}
+                  size={18}
+                  color={item.isFavorite ? '#EF4444' : '#64748B'}
+                />
               </TouchableOpacity>
 
               {/* Type badge */}
@@ -134,7 +137,12 @@ export function HomeFeaturedList({ onPressItem, onToggleFavorite, onSeeAll }: Ho
             {/* Card info */}
             <View style={styles.cardBody}>
               <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
-              <Text style={styles.cardAddress} numberOfLines={1}>📍 {item.address}</Text>
+              
+              {/* Hàng địa chỉ với icon vector */}
+              <View style={styles.addressRow}>
+                <Ionicons name="location-outline" size={13} color="#94A3B8" />
+                <Text style={styles.cardAddress} numberOfLines={1}>{item.address}</Text>
+              </View>
 
               {/* Price row */}
               <View style={styles.priceRow}>
@@ -142,11 +150,24 @@ export function HomeFeaturedList({ onPressItem, onToggleFavorite, onSeeAll }: Ho
                 <Text style={styles.pricePerM2}>{item.pricePerM2}</Text>
               </View>
 
-              {/* Specs row */}
+              {/* Specs row với icon vector */}
               <View style={styles.specsRow}>
-                <Text style={styles.spec}>📐 {item.area}m²</Text>
-                {item.bedrooms > 0 && <Text style={styles.spec}>🛏 {item.bedrooms}PN</Text>}
-                {item.bathrooms > 0 && <Text style={styles.spec}>🚿 {item.bathrooms}WC</Text>}
+                <View style={styles.specItem}>
+                  <MaterialCommunityIcons name="ruler-square" size={13} color="#64748B" />
+                  <Text style={styles.specText}>{item.area}m²</Text>
+                </View>
+                {item.bedrooms > 0 && (
+                  <View style={styles.specItem}>
+                    <MaterialCommunityIcons name="bed-double-outline" size={13} color="#64748B" />
+                    <Text style={styles.specText}>{item.bedrooms}PN</Text>
+                  </View>
+                )}
+                {item.bathrooms > 0 && (
+                  <View style={styles.specItem}>
+                    <MaterialCommunityIcons name="shower" size={13} color="#64748B" />
+                    <Text style={styles.specText}>{item.bathrooms}WC</Text>
+                  </View>
+                )}
               </View>
             </View>
           </TouchableOpacity>
@@ -265,6 +286,12 @@ const styles = StyleSheet.create({
   cardAddress: {
     fontSize: 11,
     color: GRAY_500,
+    flex: 1,
+  },
+  addressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   priceRow: {
     flexDirection: 'row',
@@ -286,7 +313,12 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 2,
   },
-  spec: {
+  specItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  specText: {
     fontSize: 11,
     color: GRAY_700,
   },

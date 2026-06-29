@@ -36,6 +36,10 @@ export default function AppTabs() {
   const isSeller = role === 'seller' || pathname.startsWith('/seller');
 
   if (isSeller) {
+    /**
+     * SELLER TAB BAR theo spec 07_SCREEN_MOBILE.md (dòng 166):
+     * Trang chủ | Tin đăng | + (Đăng tin) | Leads | Tài khoản
+     */
     return (
       <NativeTabs
         backgroundColor={colors.background}
@@ -51,7 +55,7 @@ export default function AppTabs() {
           />
         </NativeTabs.Trigger>
 
-        {/* Tab 2: Quản lý tin */}
+        {/* Tab 2: Quản lý tin đăng */}
         <NativeTabs.Trigger name="seller-listings">
           <NativeTabs.Trigger.Label>Tin đăng</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon
@@ -60,7 +64,7 @@ export default function AppTabs() {
           />
         </NativeTabs.Trigger>
 
-        {/* Tab 3: Đăng tin mới */}
+        {/* Tab 3: Đăng tin mới (+) – nút ở giữa */}
         <NativeTabs.Trigger name="seller-post">
           <NativeTabs.Trigger.Label>Đăng tin</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon
@@ -69,7 +73,16 @@ export default function AppTabs() {
           />
         </NativeTabs.Trigger>
 
-        {/* Tab 4: Tài khoản */}
+        {/* Tab 4: Leads CRM – Màn 23 */}
+        <NativeTabs.Trigger name="seller-leads">
+          <NativeTabs.Trigger.Label>Leads</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon
+            src={require('@/assets/images/tabIcons/profile.png')}
+            renderingMode="template"
+          />
+        </NativeTabs.Trigger>
+
+        {/* Tab 5: Tài khoản Seller */}
         <NativeTabs.Trigger name="seller-profile">
           <NativeTabs.Trigger.Label>Tài khoản</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon
@@ -81,7 +94,10 @@ export default function AppTabs() {
     );
   }
 
-  // Mặc định: Hiển thị Tab Bar của Người mua (Buyer)
+  /**
+   * BUYER TAB BAR theo spec 07_SCREEN_MOBILE.md (dòng 61):
+   * Trang chủ | Tìm kiếm | Đăng tin (+) | Tin nhắn | Tài khoản
+   */
   return (
     <NativeTabs
       backgroundColor={colors.background}
@@ -106,16 +122,25 @@ export default function AppTabs() {
         />
       </NativeTabs.Trigger>
 
-      {/* Tab 3: Yêu thích */}
-      <NativeTabs.Trigger name="saved">
-        <NativeTabs.Trigger.Label>Yêu thích</NativeTabs.Trigger.Label>
+      {/* Tab 3: Đăng tin (+) – nút ở giữa theo spec */}
+      <NativeTabs.Trigger name="seller-post">
+        <NativeTabs.Trigger.Label>Đăng tin</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           src={require('@/assets/images/tabIcons/saved.png')}
           renderingMode="template"
         />
       </NativeTabs.Trigger>
 
-      {/* Tab 4: Tài khoản */}
+      {/* Tab 4: Tin nhắn (Hộp thư) */}
+      <NativeTabs.Trigger name="inbox">
+        <NativeTabs.Trigger.Label>Tin nhắn</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          src={require('@/assets/images/tabIcons/explore.png')}
+          renderingMode="template"
+        />
+      </NativeTabs.Trigger>
+
+      {/* Tab 5: Tài khoản */}
       <NativeTabs.Trigger name="profile">
         <NativeTabs.Trigger.Label>Tài khoản</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon

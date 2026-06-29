@@ -3,6 +3,7 @@
  * Hỗ trợ cả chọn một (singleSelect) và chọn nhiều (multiSelect)
  */
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 
 // --- Màu sắc theo Design System ---
 const PRIMARY  = '#2563EB';
@@ -14,7 +15,9 @@ const WHITE    = '#FFFFFF';
 export interface ChipOption {
   id: string;
   label: string;
-  emoji?: string; // icon tùy chọn hiển thị trước label
+  emoji?: string; // fallback emoji
+  iconName?: string;
+  iconType?: 'ionicons' | 'material' | 'feather';
 }
 
 interface FilterChipGroupProps {
@@ -63,7 +66,27 @@ export function FilterChipGroup({
               accessibilityLabel={`Lọc ${label}: ${opt.label}`}
               accessibilityState={{ selected: isActive }}
             >
-              {opt.emoji ? (
+              {opt.iconName && opt.iconType ? (
+                opt.iconType === 'material' ? (
+                  <MaterialCommunityIcons
+                    name={opt.iconName as any}
+                    size={14}
+                    color={isActive ? PRIMARY : GRAY_500}
+                  />
+                ) : opt.iconType === 'ionicons' ? (
+                  <Ionicons
+                    name={opt.iconName as any}
+                    size={14}
+                    color={isActive ? PRIMARY : GRAY_500}
+                  />
+                ) : (
+                  <Feather
+                    name={opt.iconName as any}
+                    size={13}
+                    color={isActive ? PRIMARY : GRAY_500}
+                  />
+                )
+              ) : opt.emoji ? (
                 <Text style={styles.chipEmoji}>{opt.emoji}</Text>
               ) : null}
               <Text style={[styles.chipText, isActive && styles.chipTextActive]}>

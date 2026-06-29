@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PropertyGallery, GallerySlide } from './property-gallery';
 import { GalleryOverlay } from './gallery-overlay';
+import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const PRIMARY  = '#2563EB';
@@ -91,11 +92,31 @@ export function PropertyDetailOverlay({
 
   const p = property;
 
+  function getAmenityIcon(label: string, color: string) {
+    switch (label) {
+      case 'Hồ bơi': return <MaterialCommunityIcons name="swim" size={20} color={color} />;
+      case 'Gym': return <MaterialCommunityIcons name="dumbbell" size={20} color={color} />;
+      case 'Thang máy': return <MaterialCommunityIcons name="elevator-passenger-outline" size={20} color={color} />;
+      case 'Bãi xe': return <Ionicons name="car-outline" size={20} color={color} />;
+      case 'Bảo vệ 24/7': return <Ionicons name="shield-outline" size={20} color={color} />;
+      case 'Công viên': return <MaterialCommunityIcons name="tree-outline" size={20} color={color} />;
+      default: return <Ionicons name="sparkles-outline" size={20} color={color} />;
+    }
+  }
+
   /** Hàng thông số: icon + giá trị + nhãn */
-  function SpecItem({ emoji, value, label }: { emoji: string; value: string | number; label: string }) {
+  function SpecItem({ iconName, iconType, value, label }: { iconName: string; iconType: 'ionicons' | 'material' | 'feather'; value: string | number; label: string }) {
     return (
       <View style={styles.specItem}>
-        <Text style={styles.specEmoji}>{emoji}</Text>
+        <View style={styles.specIconWrap}>
+          {iconType === 'material' ? (
+            <MaterialCommunityIcons name={iconName as any} size={18} color={PRIMARY} />
+          ) : iconType === 'ionicons' ? (
+            <Ionicons name={iconName as any} size={18} color={PRIMARY} />
+          ) : (
+            <Feather name={iconName as any} size={16} color={PRIMARY} />
+          )}
+        </View>
         <Text style={styles.specValue}>{value}</Text>
         <Text style={styles.specLabel}>{label}</Text>
       </View>
@@ -109,18 +130,22 @@ export function PropertyDetailOverlay({
         <SafeAreaView edges={['top']}>
           <View style={styles.floatingRow}>
             <TouchableOpacity style={styles.iconBtn} onPress={onClose} accessibilityLabel="Quay lại">
-              <Text style={styles.iconBtnText}>←</Text>
+              <Feather name="arrow-left" size={20} color={GRAY_800} />
             </TouchableOpacity>
             <View style={styles.floatingRight}>
               <TouchableOpacity style={styles.iconBtn} accessibilityLabel="Chia sẻ tin đăng">
-                <Text style={styles.iconBtnText}>↗</Text>
+                <Feather name="share-2" size={18} color={GRAY_800} />
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.iconBtn}
                 onPress={() => onToggleFavorite(p.id)}
                 accessibilityLabel={p.isFavorite ? 'Bỏ yêu thích' : 'Thêm yêu thích'}
               >
-                <Text style={styles.iconBtnText}>{p.isFavorite ? '❤️' : '🤍'}</Text>
+                <Ionicons
+                  name={p.isFavorite ? 'heart' : 'heart-outline'}
+                  size={20}
+                  color={p.isFavorite ? '#EF4444' : GRAY_800}
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -155,7 +180,10 @@ export function PropertyDetailOverlay({
           <Text style={styles.title}>{p.title}</Text>
 
           {/* Địa chỉ */}
-          <Text style={styles.address}>📍 {p.address}</Text>
+          <View style={styles.addressRow}>
+            <Ionicons name="location-outline" size={14} color="#64748B" />
+            <Text style={styles.address}>{p.address}</Text>
+          </View>
 
           {/* Giá */}
           <View style={styles.priceRow}>
@@ -165,12 +193,12 @@ export function PropertyDetailOverlay({
 
           {/* Hàng thông số */}
           <View style={styles.specsRow}>
-            <SpecItem emoji="📐" value={`${p.area}m²`} label="Diện tích" />
-            {p.bedrooms ? <SpecItem emoji="🛏" value={p.bedrooms} label="Phòng ngủ" /> : null}
-            {p.bathrooms ? <SpecItem emoji="🚿" value={p.bathrooms} label="Phòng tắm" /> : null}
-            {p.floor ? <SpecItem emoji="🏢" value={`T${p.floor}`} label="Tầng" /> : null}
-            {p.direction ? <SpecItem emoji="🧭" value={p.direction} label="Hướng" /> : null}
-            {p.view ? <SpecItem emoji="🌅" value={p.view} label="View" /> : null}
+            <SpecItem iconName="ruler-square" iconType="material" value={`${p.area}m²`} label="Diện tích" />
+            {p.bedrooms ? <SpecItem iconName="bed-double-outline" iconType="material" value={p.bedrooms} label="Phòng ngủ" /> : null}
+            {p.bathrooms ? <SpecItem iconName="shower" iconType="material" value={p.bathrooms} label="Phòng tắm" /> : null}
+            {p.floor ? <SpecItem iconName="office-building-outline" iconType="material" value={`T${p.floor}`} label="Tầng" /> : null}
+            {p.direction ? <SpecItem iconName="compass-outline" iconType="material" value={p.direction} label="Hướng" /> : null}
+            {p.view ? <SpecItem iconName="eye" iconType="feather" value={p.view} label="View" /> : null}
           </View>
 
           <Divider />
@@ -191,7 +219,9 @@ export function PropertyDetailOverlay({
           <View style={styles.amenitiesGrid}>
             {p.amenities.map((a, i) => (
               <View key={i} style={styles.amenityItem}>
-                <Text style={styles.amenityEmoji}>{a.emoji}</Text>
+                <View style={styles.amenityIconBox}>
+                  {getAmenityIcon(a.label, PRIMARY)}
+                </View>
                 <Text style={styles.amenityLabel}>{a.label}</Text>
               </View>
             ))}
@@ -208,7 +238,8 @@ export function PropertyDetailOverlay({
               <Text style={styles.agentPhone}>{p.agent.phone}</Text>
             </View>
             <TouchableOpacity style={styles.callBtn} accessibilityLabel="Gọi ngay cho môi giới">
-              <Text style={styles.callBtnText}>📞 Gọi</Text>
+              <Feather name="phone" size={14} color={WHITE} style={{ marginRight: 4 }} />
+              <Text style={styles.callBtnText}>Gọi</Text>
             </TouchableOpacity>
           </View>
 
@@ -222,10 +253,12 @@ export function PropertyDetailOverlay({
         <SafeAreaView edges={['bottom']}>
           <View style={styles.ctaRow}>
             <TouchableOpacity style={styles.ctaOutline} accessibilityLabel="Đặt lịch xem nhà">
-              <Text style={styles.ctaOutlineText}>📅 Đặt lịch xem</Text>
+              <Feather name="calendar" size={15} color={PRIMARY} style={{ marginRight: 6 }} />
+              <Text style={styles.ctaOutlineText}>Đặt lịch xem</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.ctaPrimary} accessibilityLabel="Liên hệ ngay với môi giới">
-              <Text style={styles.ctaPrimaryText}>💬 Liên hệ ngay</Text>
+              <Feather name="message-circle" size={15} color={WHITE} style={{ marginRight: 6 }} />
+              <Text style={styles.ctaPrimaryText}>Liên hệ ngay</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -280,15 +313,24 @@ const styles = StyleSheet.create({
 
   // Tên + giá
   title: { fontSize: 18, fontWeight: '800', color: GRAY_800, lineHeight: 24, letterSpacing: -0.3 },
-  address: { fontSize: 13, color: GRAY_500 },
+  address: { fontSize: 13, color: GRAY_500, flex: 1 },
+  addressRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
   priceRow: { flexDirection: 'row', alignItems: 'baseline', marginTop: 2 },
   price: { fontSize: 22, fontWeight: '900', color: PRIMARY },
   pricePerM2: { fontSize: 12, color: GRAY_500 },
 
   // Thông số
   specsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 4 },
-  specItem: { alignItems: 'center', gap: 2, minWidth: 56 },
-  specEmoji: { fontSize: 20 },
+  specItem: { alignItems: 'center', gap: 2, minWidth: 58 },
+  specIconWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#EFF6FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 2,
+  },
   specValue: { fontSize: 14, fontWeight: '700', color: GRAY_800 },
   specLabel: { fontSize: 10, color: GRAY_500 },
 
@@ -301,11 +343,17 @@ const styles = StyleSheet.create({
   // Tiện ích grid
   amenitiesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   amenityItem: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: GRAY_100, borderRadius: 10,
-    paddingHorizontal: 10, paddingVertical: 7,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: GRAY_100,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
   },
-  amenityEmoji: { fontSize: 16 },
+  amenityIconBox: {
+    marginRight: 2,
+  },
   amenityLabel: { fontSize: 12, fontWeight: '600', color: GRAY_700 },
 
   // Môi giới

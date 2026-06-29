@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { BottomTabInset } from '@/constants/theme';
+import { Ionicons, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const BG = '#F9FAFB';
 const PRIMARY = '#2563EB';
@@ -25,25 +26,32 @@ const GREEN = '#16A34A';
 const WHITE = '#FFFFFF';
 
 interface MenuItemProps {
-  emoji: string;
+  iconName: string;
+  iconType: 'ionicons' | 'material' | 'feather';
   title: string;
   subtitle?: string;
   onPress: () => void;
 }
 
-function MenuItem({ emoji, title, subtitle, onPress }: MenuItemProps) {
+function MenuItem({ iconName, iconType, title, subtitle, onPress }: MenuItemProps) {
   return (
     <TouchableOpacity style={styles.menuItem} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.menuLeft}>
         <View style={styles.menuIconWrap}>
-          <Text style={styles.menuEmoji}>{emoji}</Text>
+          {iconType === 'material' ? (
+            <MaterialCommunityIcons name={iconName as any} size={18} color={PRIMARY} />
+          ) : iconType === 'ionicons' ? (
+            <Ionicons name={iconName as any} size={18} color={PRIMARY} />
+          ) : (
+            <Feather name={iconName as any} size={16} color={PRIMARY} />
+          )}
         </View>
         <View style={styles.menuTextWrap}>
           <Text style={styles.menuTitle}>{title}</Text>
           {subtitle ? <Text style={styles.menuSubtitle}>{subtitle}</Text> : null}
         </View>
       </View>
-      <Text style={styles.menuChevron}>›</Text>
+      <Feather name="chevron-right" size={16} color={GRAY_500} />
     </TouchableOpacity>
   );
 }
@@ -72,13 +80,14 @@ export default function ProfileScreen() {
         {/* ==================== 1. PROFILE HEADER ==================== */}
         <View style={styles.profileCard}>
           <View style={styles.avatarWrap}>
-            <Text style={styles.avatarEmoji}>👩‍💼</Text>
+            <Ionicons name="person" size={32} color="#94A3B8" />
           </View>
           <View style={styles.profileDetails}>
             <View style={styles.nameRow}>
               <Text style={styles.profileName}>Nguyễn Thị Buyer</Text>
               <View style={styles.verifiedBadge}>
-                <Text style={styles.verifiedText}>✓ Đã xác minh</Text>
+                <Ionicons name="checkmark-circle" size={12} color={GREEN} style={{ marginRight: 2 }} />
+                <Text style={styles.verifiedText}>Đã xác minh</Text>
               </View>
             </View>
             <Text style={styles.profileEmail}>buyer.nguyen@mapzest.vn</Text>
@@ -95,7 +104,8 @@ export default function ProfileScreen() {
           }}
           activeOpacity={0.8}
         >
-          <Text style={styles.switchRoleText}>🔄 Chuyển sang giao diện Người bán</Text>
+          <Ionicons name="swap-horizontal" size={16} color={PRIMARY} style={{ marginRight: 6 }} />
+          <Text style={styles.switchRoleText}>Chuyển sang giao diện Người bán</Text>
         </TouchableOpacity>
 
         {/* ==================== 2. STATS BAR ==================== */}
@@ -123,28 +133,32 @@ export default function ProfileScreen() {
           <Text style={styles.sectionTitle}>Tài khoản & Giao dịch</Text>
           <View style={styles.menuGroup}>
             <MenuItem
-              emoji="👤"
+              iconName="person-outline"
+              iconType="ionicons"
               title="Hồ sơ cá nhân"
               subtitle="Thông tin tài khoản, mật khẩu, xác thực"
               onPress={() => handleMenuPress('Hồ sơ cá nhân')}
             />
             <View style={styles.itemDivider} />
             <MenuItem
-              emoji="🔍"
+              iconName="search-outline"
+              iconType="ionicons"
               title="Tìm kiếm đã lưu"
               subtitle="Nhận thông báo khi có tin đăng mới phù hợp"
               onPress={() => handleMenuPress('Tìm kiếm đã lưu')}
             />
             <View style={styles.itemDivider} />
             <MenuItem
-              emoji="📅"
+              iconName="calendar-outline"
+              iconType="ionicons"
               title="Lịch xem nhà"
               subtitle="Quản lý lịch hẹn xem nhà thực tế"
               onPress={() => handleMenuPress('Lịch xem nhà')}
             />
             <View style={styles.itemDivider} />
             <MenuItem
-              emoji="📞"
+              iconName="call-outline"
+              iconType="ionicons"
               title="BĐS đã liên hệ"
               subtitle="Danh sách các tin đăng bạn đã hỏi hoặc gọi điện"
               onPress={() => handleMenuPress('BĐS đã liên hệ')}
@@ -156,19 +170,22 @@ export default function ProfileScreen() {
           <Text style={styles.sectionTitle}>Hỗ trợ & Ứng dụng</Text>
           <View style={styles.menuGroup}>
             <MenuItem
-              emoji="ℹ️"
+              iconName="help-circle-outline"
+              iconType="ionicons"
               title="Trung tâm hỗ trợ"
               onPress={() => handleMenuPress('Trung tâm hỗ trợ')}
             />
             <View style={styles.itemDivider} />
             <MenuItem
-              emoji="💬"
+              iconName="chatbubble-ellipses-outline"
+              iconType="ionicons"
               title="Liên hệ hỗ trợ"
               onPress={() => handleMenuPress('Liên hệ hỗ trợ')}
             />
             <View style={styles.itemDivider} />
             <MenuItem
-              emoji="⚙️"
+              iconName="settings-outline"
+              iconType="ionicons"
               title="Cài đặt hệ thống"
               onPress={() => handleMenuPress('Cài đặt hệ thống')}
             />
@@ -244,9 +261,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarEmoji: {
-    fontSize: 32,
-  },
   profileDetails: {
     flex: 1,
     gap: 4,
@@ -264,6 +278,8 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
   },
   verifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#E6F4EA',
     borderRadius: 6,
     paddingHorizontal: 6,
@@ -356,9 +372,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  menuEmoji: {
-    fontSize: 18,
-  },
   menuTextWrap: {
     flex: 1,
     gap: 2,
@@ -372,12 +385,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: GRAY_500,
     lineHeight: 14,
-  },
-  menuChevron: {
-    fontSize: 20,
-    color: GRAY_500,
-    fontWeight: '300',
-    paddingLeft: 8,
   },
   itemDivider: {
     height: 1,
@@ -401,10 +408,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   switchRoleBtn: {
+    flexDirection: 'row',
     backgroundColor: '#EFF6FF',
     borderRadius: 14,
     paddingVertical: 12,
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1.5,
     borderColor: PRIMARY,
     marginTop: -8,

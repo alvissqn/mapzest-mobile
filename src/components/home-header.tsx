@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text, TouchableOpacity, TextInput, Platform } from 'react-native';
+import { Feather, Ionicons } from '@expo/vector-icons';
 
 // Primary blue theo Design System MapZest
 const PRIMARY = '#2563EB';
@@ -20,7 +21,7 @@ export function HomeHeader({ onNotificationPress, onSearchFocus }: HomeHeaderPro
         {/* Logo */}
         <View style={styles.logoWrap}>
           <View style={styles.logoPin}>
-            <View style={styles.logoPinInner} />
+            <Ionicons name="location" size={14} color="#FFFFFF" />
           </View>
           <Text style={styles.logoText}>
             Map<Text style={styles.logoAccent}>Zest</Text>
@@ -34,12 +35,7 @@ export function HomeHeader({ onNotificationPress, onSearchFocus }: HomeHeaderPro
           activeOpacity={0.75}
           accessibilityLabel="Thông báo"
         >
-          <View style={styles.notifIcon}>
-            {/* Bell shape dùng View */}
-            <View style={styles.bellTop} />
-            <View style={styles.bellBody} />
-            <View style={styles.bellBottom} />
-          </View>
+          <Feather name="bell" size={20} color={GRAY_700} />
           {/* Badge số */}
           <View style={styles.badge}>
             <Text style={styles.badgeText}>3</Text>
@@ -54,7 +50,7 @@ export function HomeHeader({ onNotificationPress, onSearchFocus }: HomeHeaderPro
         activeOpacity={0.85}
         accessibilityLabel="Tìm kiếm khu vực, dự án, địa điểm"
       >
-        <Text style={styles.searchIcon}>🔍</Text>
+        <Feather name="search" size={16} color={GRAY_400} />
         <Text style={styles.searchPlaceholder}>
           Tìm khu vực, dự án, địa điểm...
         </Text>
@@ -98,12 +94,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logoPinInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#FFFFFF',
-  },
   logoText: {
     fontSize: 20,
     fontWeight: '800',
@@ -122,32 +112,6 @@ const styles = StyleSheet.create({
     backgroundColor: GRAY_100,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  notifIcon: {
-    alignItems: 'center',
-    gap: 1,
-  },
-  bellTop: {
-    width: 12,
-    height: 6,
-    borderTopLeftRadius: 6,
-    borderTopRightRadius: 6,
-    backgroundColor: GRAY_700,
-    marginBottom: 0,
-  },
-  bellBody: {
-    width: 16,
-    height: 9,
-    borderTopLeftRadius: 2,
-    borderTopRightRadius: 2,
-    backgroundColor: GRAY_700,
-  },
-  bellBottom: {
-    width: 8,
-    height: 3,
-    borderBottomLeftRadius: 3,
-    borderBottomRightRadius: 3,
-    backgroundColor: GRAY_700,
   },
   badge: {
     position: 'absolute',

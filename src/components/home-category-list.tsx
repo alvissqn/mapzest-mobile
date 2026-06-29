@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const PRIMARY = '#2563EB';
 const GRAY_100 = '#F3F4F6';
@@ -8,16 +9,17 @@ const GRAY_800 = '#1F2937';
 export interface Category {
   id: string;
   label: string;
-  emoji: string;
+  iconName: string;
+  iconType: 'ionicons' | 'material';
   count: number;
 }
 
 const CATEGORIES: Category[] = [
-  { id: 'can-ho',  label: 'Căn hộ',   emoji: '🏢', count: 1240 },
-  { id: 'nha-pho', label: 'Nhà phố',  emoji: '🏠', count: 856  },
-  { id: 'biet-thu',label: 'Biệt thự', emoji: '🏰', count: 312  },
-  { id: 'dat-nen', label: 'Đất nền',  emoji: '🌿', count: 594  },
-  { id: 'du-an',   label: 'Dự án',    emoji: '🏗️', count: 78   },
+  { id: 'can-ho',  label: 'Căn hộ',   iconName: 'office-building-outline', iconType: 'material', count: 1240 },
+  { id: 'nha-pho', label: 'Nhà phố',  iconName: 'home-outline', iconType: 'ionicons', count: 856  },
+  { id: 'biet-thu',label: 'Biệt thự', iconName: 'home-city-outline', iconType: 'material', count: 312  },
+  { id: 'dat-nen', label: 'Đất nền',  iconName: 'sprout-outline', iconType: 'material', count: 594  },
+  { id: 'du-an',   label: 'Dự án',    iconName: 'crane', iconType: 'material', count: 78   },
 ];
 
 interface HomeCategoryListProps {
@@ -52,7 +54,19 @@ export function HomeCategoryList({ selectedId, onSelect, onSeeAll }: HomeCategor
               accessibilityLabel={`Danh mục ${cat.label}, ${cat.count} tin`}
             >
               <View style={[styles.iconWrap, isActive && styles.iconWrapActive]}>
-                <Text style={styles.emoji}>{cat.emoji}</Text>
+                {cat.iconType === 'material' ? (
+                  <MaterialCommunityIcons
+                    name={cat.iconName as any}
+                    size={22}
+                    color={isActive ? '#FFFFFF' : PRIMARY}
+                  />
+                ) : (
+                  <Ionicons
+                    name={cat.iconName as any}
+                    size={22}
+                    color={isActive ? '#FFFFFF' : PRIMARY}
+                  />
+                )}
               </View>
               <Text style={[styles.label, isActive && styles.labelActive]}>
                 {cat.label}

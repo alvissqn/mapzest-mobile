@@ -29,6 +29,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -66,7 +67,7 @@ const SLIDES = [
 // ─── Feature Chip ─────────────────────────────────────────────────────────────
 function FeatureChip({ label, color }: { label: string; color: string }) {
   return (
-    <View style={[chipStyles.chip, { borderColor: color + '40', backgroundColor: color + '12' }]}>
+    <View style={[chipStyles.chip, { backgroundColor: color + '0E' }]}>
       <View style={[chipStyles.dot, { backgroundColor: color }]} />
       <Text style={[chipStyles.label, { color }]}>{label}</Text>
     </View>
@@ -81,7 +82,6 @@ const chipStyles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    borderWidth: 1,
   },
   dot: {
     width: 6,
@@ -96,8 +96,7 @@ const chipStyles = StyleSheet.create({
 
 // ─── Slide Illustration ───────────────────────────────────────────────────────
 /**
- * Illustration đơn giản, không dùng position:absolute phức tạp
- * để tránh clipping issues trên Android.
+ * Illustration chuyên nghiệp sử dụng vector icons của Expo thay vì emoji.
  */
 function SlideIllustration({ slideIndex }: { slideIndex: number }) {
   const slide = SLIDES[slideIndex];
@@ -105,18 +104,22 @@ function SlideIllustration({ slideIndex }: { slideIndex: number }) {
 
   return (
     <View style={[illusStyles.container, { backgroundColor: slide.accentColor + '10' }]}>
-      {/* Emoji large — render đơn giản, chắc chắn hiện trên mọi device */}
-      <Text style={illusStyles.emoji}>{slide.emoji}</Text>
+      {/* Vector Icon thay thế Emoji */}
+      <View style={illusStyles.iconContainer}>
+        {slide.id === 1 && <Ionicons name="map" size={72} color={slide.accentColor} />}
+        {slide.id === 2 && <Ionicons name="search" size={72} color={slide.accentColor} />}
+        {slide.id === 3 && <MaterialCommunityIcons name="handshake" size={72} color={slide.accentColor} />}
+      </View>
 
       {/* Card minh hoạ */}
-      <View style={[illusStyles.card, { borderColor: slide.accentColor + '30' }]}>
-        <View style={[illusStyles.cardHeader, { backgroundColor: slide.accentColor + '15' }]}>
+      <View style={illusStyles.card}>
+        <View style={[illusStyles.cardHeader, { backgroundColor: slide.accentColor + '10' }]}>
           <View style={[illusStyles.cardDot, { backgroundColor: slide.accentColor }]} />
-          <View style={[illusStyles.cardLine, { backgroundColor: slide.accentColor + '40', width: 80 }]} />
+          <View style={[illusStyles.cardLine, { backgroundColor: slide.accentColor + '30', width: 80 }]} />
         </View>
         <View style={illusStyles.cardBody}>
-          <View style={[illusStyles.cardLine, { backgroundColor: '#E2E8F0', width: 120 }]} />
-          <View style={[illusStyles.cardLine, { backgroundColor: '#E2E8F0', width: 80, marginTop: 6 }]} />
+          <View style={[illusStyles.cardLine, { backgroundColor: '#F1F5F9', width: 120 }]} />
+          <View style={[illusStyles.cardLine, { backgroundColor: '#F1F5F9', width: 80, marginTop: 6 }]} />
           <View style={[illusStyles.cardPriceRow]}>
             <View style={[illusStyles.cardBadge, { backgroundColor: slide.accentColor }]}>
               <Text style={illusStyles.cardBadgeText}>BĐS nổi bật</Text>
@@ -144,21 +147,29 @@ const illusStyles = StyleSheet.create({
     alignItems: 'center',
     gap: 16,
   },
-  emoji: {
-    fontSize: 72,
-    lineHeight: 88,
+  iconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 3,
   },
   card: {
     width: '100%',
     backgroundColor: '#fff',
     borderRadius: 16,
-    borderWidth: 1,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   cardHeader: {
     flexDirection: 'row',

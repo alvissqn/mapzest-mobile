@@ -21,11 +21,11 @@ const BG       = '#F9FAFB';
 
 // --- Dữ liệu các lựa chọn bộ lọc ---
 const TYPES: ChipOption[]     = [
-  { id: 'can-ho',   label: 'Căn hộ',   emoji: '🏢' },
-  { id: 'nha-pho',  label: 'Nhà phố',  emoji: '🏠' },
-  { id: 'biet-thu', label: 'Biệt thự', emoji: '🏰' },
-  { id: 'dat-nen',  label: 'Đất nền',  emoji: '🌿' },
-  { id: 'du-an',    label: 'Dự án',    emoji: '🏗️' },
+  { id: 'can-ho',   label: 'Căn hộ',   iconName: 'office-building-outline', iconType: 'material' },
+  { id: 'nha-pho',  label: 'Nhà phố',  iconName: 'home-outline', iconType: 'ionicons' },
+  { id: 'biet-thu', label: 'Biệt thự', iconName: 'home-city-outline', iconType: 'material' },
+  { id: 'dat-nen',  label: 'Đất nền',  iconName: 'sprout-outline', iconType: 'material' },
+  { id: 'du-an',    label: 'Dự án',    iconName: 'crane', iconType: 'material' },
 ];
 const PRICES: ChipOption[]    = [
   { id: 'lt2',  label: 'Dưới 2 tỷ' },
@@ -48,11 +48,11 @@ const BEDROOMS: ChipOption[]  = [
   { id: '4pn',    label: '4+ PN'  },
 ];
 const AMENITIES: ChipOption[] = [
-  { id: 'pool',     label: 'Hồ bơi',    emoji: '🏊' },
-  { id: 'gym',      label: 'Gym',        emoji: '🏋️' },
-  { id: 'elevator', label: 'Thang máy', emoji: '🛗' },
-  { id: 'parking',  label: 'Bãi xe',    emoji: '🚗' },
-  { id: 'security', label: 'Bảo vệ',    emoji: '💂' },
+  { id: 'pool',     label: 'Hồ bơi',    iconName: 'swim', iconType: 'material' },
+  { id: 'gym',      label: 'Gym',        iconName: 'dumbbell', iconType: 'material' },
+  { id: 'elevator', label: 'Thang máy', iconName: 'elevator-passenger-outline', iconType: 'material' },
+  { id: 'parking',  label: 'Bãi xe',    iconName: 'car-outline', iconType: 'ionicons' },
+  { id: 'security', label: 'Bảo vệ',    iconName: 'shield-outline', iconType: 'ionicons' },
 ];
 const STATUS: ChipOption[]    = [
   { id: 'all',   label: 'Tất cả'    },

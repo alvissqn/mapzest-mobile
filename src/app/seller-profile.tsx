@@ -15,6 +15,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { BottomTabInset } from '@/constants/theme';
+import { Ionicons, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { SellerAnalyticsOverlay } from '@/components/seller-analytics-overlay';
+import { SellerVipOverlay } from '@/components/seller-vip-overlay';
+import { useState } from 'react';
 
 const BG = '#F9FAFB';
 const PRIMARY = '#2563EB';
@@ -26,31 +30,41 @@ const GREEN = '#16A34A';
 const WHITE = '#FFFFFF';
 
 interface MenuItemProps {
-  emoji: string;
+  iconName: string;
+  iconType: 'ionicons' | 'material' | 'feather';
   title: string;
   subtitle?: string;
   onPress: () => void;
 }
 
-function MenuItem({ emoji, title, subtitle, onPress }: MenuItemProps) {
+function MenuItem({ iconName, iconType, title, subtitle, onPress }: MenuItemProps) {
   return (
     <TouchableOpacity style={styles.menuItem} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.menuLeft}>
         <View style={styles.menuIconWrap}>
-          <Text style={styles.menuEmoji}>{emoji}</Text>
+          {iconType === 'material' ? (
+            <MaterialCommunityIcons name={iconName as any} size={18} color={PRIMARY} />
+          ) : iconType === 'ionicons' ? (
+            <Ionicons name={iconName as any} size={18} color={PRIMARY} />
+          ) : (
+            <Feather name={iconName as any} size={16} color={PRIMARY} />
+          )}
         </View>
         <View style={styles.menuTextWrap}>
           <Text style={styles.menuTitle}>{title}</Text>
           {subtitle ? <Text style={styles.menuSubtitle}>{subtitle}</Text> : null}
         </View>
       </View>
-      <Text style={styles.menuChevron}>›</Text>
+      <Feather name="chevron-right" size={16} color={GRAY_500} />
     </TouchableOpacity>
   );
 }
 
 export default function SellerProfileScreen() {
   const router = useRouter();
+
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showVip, setShowVip] = useState(false);
 
   function handleMenuPress(name: string) {
     Alert.alert('Mapzest Seller', `Tính năng "${name}" đang được kết nối với API hệ thống.`);
@@ -73,13 +87,14 @@ export default function SellerProfileScreen() {
         {/* ==================== 1. PROFILE HEADER ==================== */}
         <View style={styles.profileCard}>
           <View style={styles.avatarWrap}>
-            <Text style={styles.avatarEmoji}>👨‍💼</Text>
+            <Ionicons name="person" size={32} color="#94A3B8" />
           </View>
           <View style={styles.profileDetails}>
             <View style={styles.nameRow}>
               <Text style={styles.profileName}>Nguyễn Văn Seller</Text>
               <View style={styles.verifiedBadge}>
-                <Text style={styles.verifiedText}>✓ Môi giới chuyên nghiệp</Text>
+                <MaterialCommunityIcons name="check-decagram" size={12} color="#D97706" style={{ marginRight: 2 }} />
+                <Text style={styles.verifiedText}>Môi giới chuyên nghiệp</Text>
               </View>
             </View>
             <Text style={styles.profileEmail}>seller.nguyen@mapzest.vn</Text>
@@ -96,7 +111,8 @@ export default function SellerProfileScreen() {
           }}
           activeOpacity={0.8}
         >
-          <Text style={styles.switchRoleText}>🔄 Chuyển sang giao diện Người mua</Text>
+          <Ionicons name="swap-horizontal" size={16} color={PRIMARY} style={{ marginRight: 6 }} />
+          <Text style={styles.switchRoleText}>Chuyển sang giao diện Người mua</Text>
         </TouchableOpacity>
 
         {/* ==================== 2. STATS BAR ==================== */}
@@ -107,13 +123,13 @@ export default function SellerProfileScreen() {
           </TouchableOpacity>
           <View style={styles.statDivider} />
           
-          <TouchableOpacity style={styles.statItem} onPress={() => handleMenuPress('Lượt xem tin')} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.statItem} onPress={() => setShowAnalytics(true)} activeOpacity={0.7}>
             <Text style={styles.statNumber}>2.4k</Text>
             <Text style={styles.statLabel}>Lượt xem</Text>
           </TouchableOpacity>
           <View style={styles.statDivider} />
           
-          <TouchableOpacity style={styles.statItem} onPress={() => handleMenuPress('Leads CRM')} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.statItem} onPress={() => router.navigate('/seller-leads')} activeOpacity={0.7}>
             <Text style={styles.statNumber}>14</Text>
             <Text style={styles.statLabel}>Khách liên hệ</Text>
           </TouchableOpacity>
@@ -124,31 +140,35 @@ export default function SellerProfileScreen() {
           <Text style={styles.sectionTitle}>Quản lý kinh doanh</Text>
           <View style={styles.menuGroup}>
             <MenuItem
-              emoji="📋"
+              iconName="list-outline"
+              iconType="ionicons"
               title="Quản lý tin đăng"
               subtitle="Danh sách tin đăng, lịch sử, chỉnh sửa và đóng tin"
               onPress={() => router.navigate('/seller-listings')}
             />
             <View style={styles.itemDivider} />
             <MenuItem
-              emoji="👥"
+              iconName="people-outline"
+              iconType="ionicons"
               title="Quản lý Khách hàng (Leads CRM)"
               subtitle="Thông tin khách liên hệ, yêu cầu mua/thuê BĐS"
-              onPress={() => handleMenuPress('Quản lý Khách hàng')}
+              onPress={() => router.navigate('/seller-leads')}
             />
             <View style={styles.itemDivider} />
             <MenuItem
-              emoji="💎"
+              iconName="diamond-outline"
+              iconType="ionicons"
               title="Gói tin VIP & Dịch vụ"
               subtitle="Đăng ký đẩy tin VIP, nạp tiền Mapzest Coin"
-              onPress={() => handleMenuPress('Gói tin VIP & Dịch vụ')}
+              onPress={() => setShowVip(true)}
             />
             <View style={styles.itemDivider} />
             <MenuItem
-              emoji="📊"
+              iconName="bar-chart-outline"
+              iconType="ionicons"
               title="Thống kê hiệu quả"
               subtitle="Báo cáo lượt click, xem tin và leads nhận được"
-              onPress={() => handleMenuPress('Thống kê hiệu quả')}
+              onPress={() => setShowAnalytics(true)}
             />
           </View>
         </View>
@@ -157,19 +177,22 @@ export default function SellerProfileScreen() {
           <Text style={styles.sectionTitle}>Cá nhân & Hỗ trợ</Text>
           <View style={styles.menuGroup}>
             <MenuItem
-              emoji="👤"
+              iconName="business-outline"
+              iconType="ionicons"
               title="Thông tin văn phòng môi giới"
               onPress={() => handleMenuPress('Thông tin văn phòng')}
             />
             <View style={styles.itemDivider} />
             <MenuItem
-              emoji="📞"
+              iconName="call-outline"
+              iconType="ionicons"
               title="Hỗ trợ đại lý / môi giới"
               onPress={() => handleMenuPress('Hỗ trợ đại lý')}
             />
             <View style={styles.itemDivider} />
             <MenuItem
-              emoji="⚙️"
+              iconName="settings-outline"
+              iconType="ionicons"
               title="Cài đặt thông báo"
               onPress={() => handleMenuPress('Cài đặt thông báo')}
             />
@@ -189,6 +212,20 @@ export default function SellerProfileScreen() {
         </TouchableOpacity>
 
       </ScrollView>
+
+      {/* RENDER CÁC OVERLAYS TOÀN MÀN HÌNH */}
+      <SellerAnalyticsOverlay
+        visible={showAnalytics}
+        onClose={() => setShowAnalytics(false)}
+        onOpenVip={() => {
+          setShowAnalytics(false);
+          setShowVip(true);
+        }}
+      />
+      <SellerVipOverlay
+        visible={showVip}
+        onClose={() => setShowVip(false)}
+      />
     </View>
   );
 }
@@ -245,9 +282,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarEmoji: {
-    fontSize: 32,
-  },
   profileDetails: {
     flex: 1,
     gap: 4,
@@ -265,6 +299,8 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
   },
   verifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#FEF3C7',
     borderRadius: 6,
     paddingHorizontal: 6,
@@ -282,10 +318,12 @@ const styles = StyleSheet.create({
 
   // Switch role btn
   switchRoleBtn: {
+    flexDirection: 'row',
     backgroundColor: '#EFF6FF',
     borderRadius: 14,
     paddingVertical: 12,
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1.5,
     borderColor: PRIMARY,
     marginTop: -8,
@@ -373,9 +411,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  menuEmoji: {
-    fontSize: 18,
-  },
   menuTextWrap: {
     flex: 1,
     gap: 2,
@@ -389,12 +424,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: GRAY_500,
     lineHeight: 14,
-  },
-  menuChevron: {
-    fontSize: 20,
-    color: GRAY_500,
-    fontWeight: '300',
-    paddingLeft: 8,
   },
   itemDivider: {
     height: 1,

@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 
 const PRIMARY  = '#2563EB';
 const GRAY_100 = '#F3F4F6';
@@ -75,7 +76,11 @@ export function SearchResultItem({
             style={styles.favBtn}
             accessibilityLabel={item.isFavorite ? 'Bỏ yêu thích' : 'Yêu thích'}
           >
-            <Text style={styles.favIcon}>{item.isFavorite ? '❤️' : '🤍'}</Text>
+            <Ionicons
+              name={item.isFavorite ? 'heart' : 'heart-outline'}
+              size={18}
+              color={item.isFavorite ? '#EF4444' : '#64748B'}
+            />
           </TouchableOpacity>
         </View>
 
@@ -83,9 +88,12 @@ export function SearchResultItem({
         <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
 
         {/* Address */}
-        <Text style={styles.address} numberOfLines={1}>
-          📍 {item.address}
-        </Text>
+        <View style={styles.addressRow}>
+          <Ionicons name="location-outline" size={13} color="#94A3B8" />
+          <Text style={styles.address} numberOfLines={1}>
+            {item.address}
+          </Text>
+        </View>
 
         {/* Price */}
         <View style={styles.priceRow}>
@@ -97,14 +105,26 @@ export function SearchResultItem({
 
         {/* Specs */}
         <View style={styles.specsRow}>
-          <Text style={styles.spec}>📐 {item.area}m²</Text>
+          <View style={styles.specItem}>
+            <MaterialCommunityIcons name="ruler-square" size={12} color="#64748B" />
+            <Text style={styles.specText}>{item.area}m²</Text>
+          </View>
           {item.bedrooms != null && item.bedrooms > 0 && (
-            <Text style={styles.spec}>🛏 {item.bedrooms}</Text>
+            <View style={styles.specItem}>
+              <MaterialCommunityIcons name="bed-double-outline" size={12} color="#64748B" />
+              <Text style={styles.specText}>{item.bedrooms}PN</Text>
+            </View>
           )}
           {item.bathrooms != null && item.bathrooms > 0 && (
-            <Text style={styles.spec}>🚿 {item.bathrooms}</Text>
+            <View style={styles.specItem}>
+              <MaterialCommunityIcons name="shower" size={12} color="#64748B" />
+              <Text style={styles.specText}>{item.bathrooms}WC</Text>
+            </View>
           )}
-          <Text style={[styles.spec, styles.postedAt]}>🕐 {item.postedAt}</Text>
+          <View style={[styles.specItem, styles.postedAt]}>
+            <Feather name="clock" size={11} color="#94A3B8" />
+            <Text style={styles.postedAtText}>{item.postedAt}</Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -191,6 +211,12 @@ const styles = StyleSheet.create({
   address: {
     fontSize: 11,
     color: GRAY_500,
+    flex: 1,
+  },
+  addressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   priceRow: {
     flexDirection: 'row',
@@ -208,15 +234,26 @@ const styles = StyleSheet.create({
   specsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 10,
     marginTop: 2,
   },
-  spec: {
+  specItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  specText: {
     fontSize: 11,
     color: GRAY_700,
   },
   postedAt: {
-    color: GRAY_400,
     marginLeft: 'auto',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  postedAtText: {
+    fontSize: 11,
+    color: GRAY_400,
   },
 });

@@ -1,85 +1,150 @@
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+/**
+ * Bản đồ trên trang chủ (Home Map Preview)
+ * Hiển thị bản đồ OpenStreetMap thật bằng WebView + Leaflet.
+ * Có các pin giá BĐS và nút "Mở bản đồ" toàn màn hình.
+ *
+ * Dùng WebView + Leaflet thay cho react-native-maps vì:
+ * - Không cần Google Maps API key
+ * - Hoạt động ngay trên Expo Go
+ * - Hỗ trợ cluster tốt
+ */
+import { useRef, useMemo } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, Platform } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 const PRIMARY = '#2563EB';
-const GRAY_100 = '#F3F4F6';
-const GRAY_300 = '#D1D5DB';
-const GRAY_500 = '#6B7280';
-const GRAY_800 = '#1F2937';
 
-// Mock pin positions (tỷ lệ %)
+// Tọa độ trung tâm TP.HCM – khu vực Thủ Đức / Quận 2
+const CENTER_LAT = 10.8031;
+const CENTER_LNG = 106.7148;
+const ZOOM = 13;
+
+// Danh sách BĐS mẫu với tọa độ thật khu vực TP.HCM
 const MOCK_PINS = [
-  { id: '1', x: 0.25, y: 0.35, price: '2.5 tỷ', active: true  },
-  { id: '2', x: 0.55, y: 0.50, price: '4.1 tỷ', active: false },
-  { id: '3', x: 0.70, y: 0.28, price: '1.8 tỷ', active: false },
-  { id: '4', x: 0.40, y: 0.65, price: '3.2 tỷ', active: false },
+  { id: '1', lat: 10.8120, lng: 106.7105, price: '2.5 tỷ', active: true },
+  { id: '2', lat: 10.7950, lng: 106.7250, price: '4.1 tỷ', active: false },
+  { id: '3', lat: 10.8230, lng: 106.7350, price: '1.8 tỷ', active: false },
+  { id: '4', lat: 10.7880, lng: 106.7000, price: '3.2 tỷ', active: false },
 ];
+
+/**
+ * Tạo HTML chứa bản đồ Leaflet với OpenStreetMap tiles và các pin giá BĐS
+ */
+function buildMapHtml(): string {
+  const pinsJson = JSON.stringify(MOCK_PINS);
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { margin: 0; padding: 0; }
+    html, body, #map { width: 100%; height: 100%; }
+    /* Ẩn attribution trên preview nhỏ */
+    .leaflet-control-attribution { font-size: 8px !important; }
+    .leaflet-control-zoom { display: none !important; }
+    /* Custom pin marker */
+    .pin-marker {
+      background: #FFFFFF;
+      border: 2px solid #D1D5DB;
+      border-radius: 8px;
+      padding: 3px 7px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #1F2937;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+    .pin-marker.active {
+      background: ${PRIMARY};
+      border-color: ${PRIMARY};
+      color: #FFFFFF;
+    }
+    .pin-marker::after {
+      content: '';
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 7px solid #D1D5DB;
+    }
+    .pin-marker.active::after {
+      border-top-color: ${PRIMARY};
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    var map = L.map('map', {
+      zoomControl: false,
+      attributionControl: true,
+      dragging: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+      touchZoom: false,
+      boxZoom: false,
+      keyboard: false,
+    }).setView([${CENTER_LAT}, ${CENTER_LNG}], ${ZOOM});
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+    }).addTo(map);
+
+    var pins = ${pinsJson};
+    pins.forEach(function(pin) {
+      var icon = L.divIcon({
+        className: '',
+        html: '<div class="pin-marker ' + (pin.active ? 'active' : '') + '">' + pin.price + '</div>',
+        iconSize: [70, 32],
+        iconAnchor: [35, 38],
+      });
+      L.marker([pin.lat, pin.lng], { icon: icon }).addTo(map);
+    });
+  </script>
+</body>
+</html>`;
+}
 
 interface HomeMapPreviewProps {
   onOpenFullMap?: () => void;
 }
 
 export function HomeMapPreview({ onOpenFullMap }: HomeMapPreviewProps) {
-  const MAP_H = 180;
-  const MAP_W_PERCENT = 1; // full width
+  const html = useMemo(() => buildMapHtml(), []);
 
   return (
     <View style={styles.wrapper}>
-      {/* Map area */}
       <TouchableOpacity
-        style={[styles.mapContainer, { height: MAP_H }]}
+        style={styles.mapContainer}
         onPress={onOpenFullMap}
-        activeOpacity={0.92}
+        activeOpacity={0.95}
         accessibilityLabel="Mở bản đồ toàn màn hình"
       >
-        {/* Grid pattern giả lập bản đồ */}
-        <View style={styles.mapBg}>
-          {/* Đường ngang */}
-          {[0.25, 0.5, 0.75].map((y) => (
-            <View
-              key={`h-${y}`}
-              style={[styles.gridLineH, { top: `${y * 100}%` as any }]}
-            />
-          ))}
-          {/* Đường dọc */}
-          {[0.2, 0.4, 0.6, 0.8].map((x) => (
-            <View
-              key={`v-${x}`}
-              style={[styles.gridLineV, { left: `${x * 100}%` as any }]}
-            />
-          ))}
-
-          {/* Khối block giả lập block nhà */}
-          <View style={[styles.block, { top: '30%', left: '15%', width: 48, height: 28 }]} />
-          <View style={[styles.block, { top: '55%', left: '35%', width: 36, height: 20 }]} />
-          <View style={[styles.block, { top: '20%', left: '60%', width: 52, height: 32 }]} />
-          <View style={[styles.block, { top: '60%', left: '65%', width: 40, height: 24 }]} />
+        {/* Bản đồ Leaflet/OpenStreetMap thật */}
+        <View style={styles.webviewContainer} pointerEvents="none">
+          <WebView
+            source={{ html }}
+            style={styles.webview}
+            scrollEnabled={false}
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            overScrollMode="never"
+            javaScriptEnabled={true}
+            domStorageEnabled={true}
+            originWhitelist={['*']}
+          />
         </View>
 
-        {/* Pin markers */}
-        {MOCK_PINS.map((pin) => (
-          <View
-            key={pin.id}
-            style={[
-              styles.pinContainer,
-              {
-                left: `${pin.x * 100}%` as any,
-                top: `${pin.y * 100}%` as any,
-              },
-            ]}
-          >
-            <View style={[styles.pinBubble, pin.active && styles.pinBubbleActive]}>
-              <Text style={[styles.pinText, pin.active && styles.pinTextActive]}>
-                {pin.price}
-              </Text>
-            </View>
-            <View style={[styles.pinTail, pin.active && styles.pinTailActive]} />
-          </View>
-        ))}
-
-        {/* Overlay gradient bottom */}
-        <View style={styles.mapGradient} />
-
-        {/* Button mở bản đồ */}
+        {/* Nút mở bản đồ toàn màn hình */}
         <View style={styles.openMapBtn}>
           <Text style={styles.openMapIcon}>🗺️</Text>
           <Text style={styles.openMapText}>Mở bản đồ</Text>
@@ -94,104 +159,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   mapContainer: {
+    height: 280,
     borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: '#E8F0FE',
     position: 'relative',
   },
-  mapBg: {
-    ...StyleSheet.absoluteFill,
+  webviewContainer: {
+    flex: 1,
   },
-  gridLineH: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.5)',
-  },
-  gridLineV: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: 1,
-    backgroundColor: 'rgba(255,255,255,0.5)',
-  },
-  block: {
-    position: 'absolute',
-    backgroundColor: '#BFDBFE',
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: '#93C5FD',
+  webview: {
+    flex: 1,
+    backgroundColor: '#E8F0FE',
   },
 
-  // Pin
-  pinContainer: {
-    position: 'absolute',
-    alignItems: 'center',
-    transform: [{ translateX: -28 }, { translateY: -32 }],
-  },
-  pinBubble: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    paddingHorizontal: 7,
-    paddingVertical: 4,
-    borderWidth: 1.5,
-    borderColor: GRAY_300,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  pinBubbleActive: {
-    backgroundColor: PRIMARY,
-    borderColor: PRIMARY,
-  },
-  pinText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: GRAY_800,
-  },
-  pinTextActive: {
-    color: '#FFFFFF',
-  },
-  pinTail: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 5,
-    borderRightWidth: 5,
-    borderTopWidth: 6,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderTopColor: GRAY_300,
-    marginTop: -1,
-  },
-  pinTailActive: {
-    borderTopColor: PRIMARY,
-  },
-
-  // Gradient overlay
-  mapGradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 60,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-  },
-
-  // Open map button
+  // Nút mở bản đồ toàn màn hình
   openMapBtn: {
     position: 'absolute',
-    bottom: 10,
+    bottom: 12,
     right: 12,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    gap: 5,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    gap: 6,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
@@ -199,10 +191,10 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   openMapIcon: {
-    fontSize: 13,
+    fontSize: 14,
   },
   openMapText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: PRIMARY,
   },

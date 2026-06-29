@@ -61,25 +61,26 @@ export function AnimatedSplashOverlay({ onFinish }: SplashOverlayProps) {
     progress.value = withTiming(1, { 
       duration: 2200, 
       easing: Easing.inOut(Easing.quad) 
-    }, (finished) => {
-      if (finished) {
-        // 4. Fade out & Slide up whole splash overlay
-        fadeOutOpacity.value = withDelay(200, withTiming(0, { 
-          duration: 500, 
-          easing: Easing.inOut(Easing.quad) 
-        }));
-        fadeOutTranslateY.value = withDelay(200, withTiming(-SCREEN_HEIGHT, { 
-          duration: 550, 
-          easing: Easing.in(Easing.quad) 
-        }, (done) => {
-          if (done) {
-            // Hide the splash screen completely, then notify parent
-            runOnJS(setVisible)(false);
-            if (onFinish) runOnJS(onFinish)();
-          }
-        }));
-      }
     });
+
+    // 4. Fade out & Slide up whole splash overlay after progress finishes
+    const fadeOutDelay = 2400; // 2200ms progress + 200ms delay
+    fadeOutOpacity.value = withDelay(fadeOutDelay, withTiming(0, { 
+      duration: 500, 
+      easing: Easing.inOut(Easing.quad) 
+    }));
+    fadeOutTranslateY.value = withDelay(fadeOutDelay, withTiming(-SCREEN_HEIGHT, { 
+      duration: 550, 
+      easing: Easing.in(Easing.quad) 
+    }));
+
+    // 5. Hide splash overlay and notify parent using robust JS timer
+    const timer = setTimeout(() => {
+      setVisible(false);
+      if (onFinish) onFinish();
+    }, fadeOutDelay + 550);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Animated styles
@@ -99,7 +100,7 @@ export function AnimatedSplashOverlay({ onFinish }: SplashOverlayProps) {
   }));
 
   const progressAnimatedStyle = useAnimatedStyle(() => ({
-    width: `${progress.value * 100}%`,
+    width: progress.value * (SCREEN_WIDTH * 0.5),
   }));
 
   if (!visible) return null;
@@ -133,8 +134,7 @@ export function AnimatedSplashOverlay({ onFinish }: SplashOverlayProps) {
         {/* Brand Name & Tagline */}
         <Animated.View style={[styles.textWrapper, textAnimatedStyle]}>
           <Text style={styles.brandText}>MAPZEST</Text>
-          <Text style={styles.taglineText}>BĐS thông minh</Text>
-          <Text style={styles.taglineText}>Kết nối giá trị</Text>
+          <Text style={styles.taglineText}>BĐS thông minh – Kết nối giá trị</Text>
         </Animated.View>
       </View>
 
@@ -367,11 +367,11 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   building: {
-    backgroundColor: 'rgba(255, 255, 255, 0.07)',
+    backgroundColor: 'rgba(10, 37, 72, 0.45)',
     marginHorizontal: 1,
   },
   buildingFront: {
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: 'rgba(6, 26, 52, 0.7)',
     marginHorizontal: 2,
   },
   progressContainer: {
